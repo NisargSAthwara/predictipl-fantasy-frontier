@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Team {
   id: number;
@@ -21,6 +22,7 @@ interface Match {
 const MatchSchedule = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulating API fetch with mock data
@@ -76,6 +78,14 @@ const MatchSchedule = () => {
       month: 'short'
     };
     return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const handlePredictNow = () => {
+    navigate('/winnings');
+  };
+
+  const handleViewAllMatches = () => {
+    navigate('/matches');
   };
 
   return (
@@ -151,7 +161,10 @@ const MatchSchedule = () => {
                   <p className="text-sm text-gray-600">{match.venue}</p>
                 </div>
                 
-                <button className="w-full mt-6 py-2 bg-ipl-blue text-white rounded-lg hover:bg-ipl-blue/90 transition-colors font-medium text-sm">
+                <button 
+                  onClick={handlePredictNow}
+                  className="w-full mt-6 py-2 bg-ipl-blue text-white rounded-lg hover:bg-ipl-blue/90 transition-colors font-medium text-sm"
+                >
                   Predict Now
                 </button>
               </div>
@@ -160,7 +173,10 @@ const MatchSchedule = () => {
         )}
 
         <div className="text-center mt-10">
-          <button className="group inline-flex items-center text-ipl-blue font-medium">
+          <button 
+            onClick={handleViewAllMatches}
+            className="group inline-flex items-center text-ipl-blue font-medium"
+          >
             View All Matches
             <svg 
               className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" 

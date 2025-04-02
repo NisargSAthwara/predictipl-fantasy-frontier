@@ -2,19 +2,28 @@
 import { useState } from 'react';
 import { Search, User, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Winnings', path: '/winnings' },
+    { name: 'Matches', path: '/matches' },
     { name: 'Fantasy Team', path: '/fantasy' },
     { name: 'Scores', path: '/scores' },
   ];
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setIsMenuOpen(false);
   };
 
   return (
@@ -34,13 +43,15 @@ const Navbar = () => {
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.path}
-                className="text-gray-700 hover:text-ipl-blue transition-colors duration-200 font-medium"
+                onClick={() => handleNavigate(link.path)}
+                className={`text-gray-700 hover:text-ipl-blue transition-colors duration-200 font-medium ${
+                  location.pathname === link.path ? 'text-ipl-orange font-semibold' : ''
+                }`}
               >
                 {link.name}
-              </a>
+              </button>
             ))}
           </div>
 
@@ -82,13 +93,15 @@ const Navbar = () => {
         <div className="md:hidden bg-white border-t border-gray-200 animate-fade-in">
           <div className="pt-2 pb-4 px-4 space-y-1 sm:px-6">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.path}
-                className="block py-2 text-base font-medium text-gray-700 hover:text-ipl-blue hover:bg-gray-50 rounded-md px-3"
+                onClick={() => handleNavigate(link.path)}
+                className={`block w-full text-left py-2 text-base font-medium hover:text-ipl-blue hover:bg-gray-50 rounded-md px-3 ${
+                  location.pathname === link.path ? 'text-ipl-orange bg-gray-50' : 'text-gray-700'
+                }`}
               >
                 {link.name}
-              </a>
+              </button>
             ))}
             <div className="pt-4 pb-2">
               <div className="relative mt-1">

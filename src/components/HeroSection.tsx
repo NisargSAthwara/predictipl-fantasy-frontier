@@ -1,14 +1,20 @@
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
       setIsLoaded(true);
     }, 100);
   }, []);
+
+  const handleNavigateToWinnings = () => {
+    navigate('/winnings');
+  };
 
   return (
     <div className="relative h-[80vh] w-full overflow-hidden mt-16">
@@ -42,10 +48,16 @@ const HeroSection = () => {
             Use advanced AI predictions to forecast match outcomes, create your fantasy team, and compete with cricket fans around the world.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-ipl-orange hover:bg-ipl-orange/90 text-white py-3 px-8 rounded-full font-medium transition-all hover:shadow-lg hover:scale-105">
+            <button 
+              onClick={handleNavigateToWinnings}
+              className="bg-ipl-orange hover:bg-ipl-orange/90 text-white py-3 px-8 rounded-full font-medium transition-all hover:shadow-lg hover:scale-105"
+            >
               Start Predicting
             </button>
-            <button className="bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white py-3 px-8 rounded-full font-medium transition-all hover:shadow-lg">
+            <button 
+              onClick={handleNavigateToWinnings}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white py-3 px-8 rounded-full font-medium transition-all hover:shadow-lg"
+            >
               Learn More
             </button>
           </div>

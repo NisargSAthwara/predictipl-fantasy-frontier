@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Category {
   id: string;
@@ -9,6 +10,8 @@ interface Category {
 }
 
 const Categories = () => {
+  const navigate = useNavigate();
+
   const categories: Category[] = [
     {
       id: 'ipl',
@@ -90,9 +93,12 @@ const Categories = () => {
             {selectedCategory === 'icc' && 'International Cricket Council (ICC) tournaments include the Cricket World Cup, T20 World Cup, and other major international cricket competitions.'}
           </p>
           
-          <button className="bg-ipl-blue text-white py-2 px-6 rounded-lg hover:bg-ipl-blue/90 transition-colors">
-            View {categories.find(c => c.id === selectedCategory)?.name} Matches
-          </button>
+          <button 
+                onClick={() => navigate('/matches')}
+                className="bg-ipl-blue text-white py-2 px-6 rounded-lg hover:bg-ipl-blue/90 transition-colors"
+              >
+                View {categories.find(c => c.id === selectedCategory)?.name} Matches
+              </button>
         </div>
       </div>
     </section>

@@ -1,6 +1,9 @@
-
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useMatchData } from '@/hooks/useMatchData';
+// Remove this line
+// import { teamMapping } from '@/utils/teamData';
 
 interface Team {
   id: number;
@@ -9,67 +12,81 @@ interface Team {
   logo: string;
 }
 
+// Update the interfaces to match the API response
+// First update the Match interface
 interface Match {
-  id: number;
-  team1: Team;
-  team2: Team;
+  id: string;
+  matchNumber: string;  // Add this field
+  teams: {
+    team1: string;
+    team2: string;
+  };
   date: string;
   time: string;
   venue: string;
   matchType: string;
+  gmtTime?: string;  // Add this field
 }
 
+const teamMapping: { [key: string]: { shortName: string; logo: string } } = {
+  'Mumbai Indians': { 
+    shortName: 'MI', 
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/MI/Logos/Medium/MI.png' 
+  },
+  'Chennai Super Kings': { 
+    shortName: 'CSK', 
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/CSK/logos/Medium/CSK.png' 
+  },
+  'Royal Challengers Bangalore': {
+    shortName: 'RCB',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/RCB/Logos/Medium/RCB.png'
+  },
+  'Kolkata Knight Riders': {
+    shortName: 'KKR',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/KKR/Logos/Medium/KKR.png'
+  },
+  'Delhi Capitals': {
+    shortName: 'DC',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/DC/Logos/Medium/DC.png'
+  },
+  'Punjab Kings': {
+    shortName: 'PBKS',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/PBKS/Logos/Medium/PBKS.png'
+  },
+  'Rajasthan Royals': {
+    shortName: 'RR',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/RR/Logos/Medium/RR.png'
+  },
+  'Sunrisers Hyderabad': {
+    shortName: 'SRH',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/SRH/Logos/Medium/SRH.png'
+  },
+  'Lucknow Super Giants': {
+    shortName: 'LSG',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/LSG/Logos/Medium/LSG.png'
+  },
+  'Gujarat Titans': {
+    shortName: 'GT',
+    logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/GT/Logos/Medium/GT.png'
+  }
+};
+
 const MatchSchedule = () => {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: matches, isLoading } = useMatchData();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Simulating API fetch with mock data
-    setTimeout(() => {
-      const mockTeams: Team[] = [
-        { id: 1, name: 'Mumbai Indians', shortName: 'MI', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/MI/Logos/Medium/MI.png' },
-        { id: 2, name: 'Chennai Super Kings', shortName: 'CSK', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/CSK/logos/Medium/CSK.png' },
-        { id: 3, name: 'Royal Challengers Bangalore', shortName: 'RCB', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/RCB/Logos/Medium/RCB.png' },
-        { id: 4, name: 'Kolkata Knight Riders', shortName: 'KKR', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/KKR/Logos/Medium/KKR.png' },
-        { id: 5, name: 'Delhi Capitals', shortName: 'DC', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/DC/Logos/Medium/DC.png' },
-        { id: 6, name: 'Punjab Kings', shortName: 'PBKS', logo: 'https://bcciplayerimages.s3.ap-south-1.amazonaws.com/ipl/PBKS/Logos/Medium/PBKS.png' },
-      ];
-
-      const mockMatches: Match[] = [
-        {
-          id: 1,
-          team1: mockTeams[0],
-          team2: mockTeams[1],
-          date: '2025-03-20',
-          time: '19:30',
-          venue: 'Wankhede Stadium, Mumbai',
-          matchType: 'IPL'
-        },
-        {
-          id: 2,
-          team1: mockTeams[2],
-          team2: mockTeams[3],
-          date: '2025-03-21',
-          time: '15:30',
-          venue: 'M. Chinnaswamy Stadium, Bangalore',
-          matchType: 'IPL'
-        },
-        {
-          id: 3,
-          team1: mockTeams[4],
-          team2: mockTeams[5],
-          date: '2025-03-22',
-          time: '19:30',
-          venue: 'Arun Jaitley Stadium, Delhi',
-          matchType: 'IPL'
-        },
-      ];
-      
-      setMatches(mockMatches);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+  // Modified filter to include today's matches that haven't finished
+  const upcomingMatches = matches
+    ? matches
+        .filter(match => {
+          const matchDate = new Date(match.date);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day
+          return matchDate >= today;
+        })
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(0, 3)
+    : [];
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -122,43 +139,42 @@ const MatchSchedule = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {matches.map((match) => (
-              <div 
-                key={match.id} 
-                className="match-card bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-semibold text-ipl-orange">{formatDate(match.date)}</span>
-                  <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{match.matchType}</span>
-                </div>
-                
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex flex-col items-center">
-                    <img 
-                      src={match.team1.logo}
-                      alt={match.team1.name}
-                      className="team-logo w-16 h-16 object-contain mb-2"
-                    />
-                    <span className="font-bold text-ipl-blue">{match.team1.shortName}</span>
+            {upcomingMatches.map((match) => (
+              <div key={match.id} className="match-card bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg flex flex-col h-full">
+                <div className="flex-grow">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-semibold text-ipl-orange">{formatDate(match.date)}</span>
+                    <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{match.matchNumber} Match</span>
                   </div>
                   
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-lg font-bold text-ipl-blue">
-                    VS
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex flex-col items-center w-1/3">
+                      <img 
+                        src={teamMapping[match.teams.team1]?.logo || '/default-team-logo.png'}
+                        alt={match.teams.team1}
+                        className="team-logo w-16 h-16 object-contain mb-2"
+                      />
+                      <span className="font-bold text-ipl-blue">{teamMapping[match.teams.team1]?.shortName}</span>
+                    </div>
+                    
+                    <div className="text-lg font-bold">
+                      VS
+                    </div>
+                    
+                    <div className="flex flex-col items-center w-1/3">
+                      <img 
+                        src={teamMapping[match.teams.team2]?.logo || '/default-team-logo.png'}
+                        alt={match.teams.team2}
+                        className="team-logo w-16 h-16 object-contain mb-2"
+                      />
+                      <span className="font-bold text-ipl-blue">{teamMapping[match.teams.team2]?.shortName}</span>
+                    </div>
                   </div>
                   
-                  <div className="flex flex-col items-center">
-                    <img 
-                      src={match.team2.logo}
-                      alt={match.team2.name}
-                      className="team-logo w-16 h-16 object-contain mb-2"
-                    />
-                    <span className="font-bold text-ipl-blue">{match.team2.shortName}</span>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-800 mb-1">{match.time} IST</p>
+                    <p className="text-sm text-gray-600">{match.venue}</p>
                   </div>
-                </div>
-                
-                <div className="text-center">
-                  <p className="font-semibold text-gray-800 mb-1">{match.time} IST</p>
-                  <p className="text-sm text-gray-600">{match.venue}</p>
                 </div>
                 
                 <button 
